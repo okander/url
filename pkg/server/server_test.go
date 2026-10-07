@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"shortener/pkg/store"
@@ -119,5 +120,20 @@ func TestAPIKeyProtectsCreateOnly(t *testing.T) {
 	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/"+resp.Code, nil))
 	if rec.Code != http.StatusFound {
 		t.Fatalf("redirect: got status %d, want %d", rec.Code, http.StatusFound)
+	}
+}
+
+func TestIndexPage(t *testing.T) {
+	srv := newTestServer()
+	rec := httptest.NewRecorder()
+	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/", nil))
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
+	}
+	if ct := rec.Header().Get("Content-Type"); !strings.HasPrefix(ct, "text/html") {
+		t.Fatalf("Content-Type = %q, want text/html", ct)
+	}
+	if !strings.Contains(rec.Body.String(), "<title>Shortener</title>") {
+		t.Fatal("index page is missing its title")
 	}
 }

@@ -22,6 +22,7 @@ Locally it uses an in-memory store (links vanish on restart). Set
 |--------|-------------|-----------------------------------------------|
 | POST   | `/links`    | Body `{"url": "https://..."}` -> short link   |
 | GET    | `/{code}`   | 302 redirect to the original URL              |
+| GET    | `/`         | Web page for creating links (needs the key)   |
 | GET    | `/healthz`  | Health check                                  |
 
 If the `API_KEY` environment variable is set, `POST /links` requires

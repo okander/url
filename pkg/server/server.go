@@ -35,6 +35,7 @@ func New(s store.Store, baseURL, apiKey string) *Server {
 		mux:     http.NewServeMux(),
 	}
 	srv.mux.HandleFunc("POST /links", srv.createLink)
+	srv.mux.HandleFunc("GET /{$}", srv.index)
 	srv.mux.HandleFunc("GET /healthz", srv.health)
 	srv.mux.HandleFunc("GET /{code}", srv.redirect)
 	return srv
@@ -103,6 +104,12 @@ func (s *Server) redirect(w http.ResponseWriter, r *http.Request) {
 	// 302, not 301: browsers cache 301s forever, which would hide repeat
 	// visits from the click analytics we add later.
 	http.Redirect(w, r, link.URL, http.StatusFound)
+}
+
+func (s *Server) index(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	_, _ = w.Write([]byte(indexHTML))
 }
 
 func (s *Server) health(w http.ResponseWriter, _ *http.Request) {
